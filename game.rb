@@ -8,26 +8,46 @@ class Game
     attr_accessor :games
   end
 
-  attr_reader :player, :dealer
+  attr_reader :user, :dealer, :bank
 
-  def initialize(player)
-    @player = player
+  def initialize
+    create_player
     create_dealer
-    add_money_to_players
+    base_money
+  end
+
+  def start
+    # round.cards_initialize
+    # players.money -= 10 & bank += 20
+    # players.cards += 2
+    puts user.inspect
+    puts dealer.inspect
+    puts "bank = #{bank}"
   end
 
   private
 
-  attr_writer :player, :dealer
+  attr_writer :user, :dealer, :bank
+
+  def create_player
+    self.user = Player.new(ask_name.capitalize)
+  end
+
+  def ask_name
+    puts ASK_NAME
+    gets.chomp
+  end
 
   def create_dealer
     self.dealer = Dealer.new
   end
 
-  def finish_game
-    game = {}
-    game[:winner] = 'winner'
-    game[:date] = 'date'
-    game[:time] = 'date'
+  def base_money
+    self.bank = 0
+    dealer.money = BASE_MONEY
+    user.money = BASE_MONEY
   end
+
+  # save statistics
+  def finish_game; end
 end
