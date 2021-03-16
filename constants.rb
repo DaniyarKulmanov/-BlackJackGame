@@ -9,3 +9,4 @@ PLAYER_ACTIONS = ['0 - ⌛ Пропустить ход️',
 SUITS = %w[♠️ ♣️ ♥️ ♦️].freeze
 PIC_CARDS = %w[Туз Король Дама Валет].freeze
 NUM_CARDS = (2..10).freeze
+LINE = '=' * 40

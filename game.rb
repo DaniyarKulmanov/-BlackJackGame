@@ -5,9 +5,11 @@ require_relative 'player'
 require_relative 'dealer'
 require_relative 'constants'
 require_relative 'deck'
+require_relative 'game_interface'
 
 class Game
   include Deck
+  include GameInterface
 
   @games = {}
   class << self
@@ -45,7 +47,7 @@ class Game
     generate_deck
     2.times { players_add_cards(user) }
     2.times { players_add_cards(dealer) }
-    game_interface
+    print_game_interface
   end
 
   # TODO: add validation below zero
@@ -64,50 +66,8 @@ class Game
     self.cards -= player_cards
   end
 
-  def game_interface
-    game_header
-    player_information(dealer)
-    player_information(user, hidden: false)
-    puts '====================='
-    puts PLAYER_ACTIONS
-  end
-
-  def game_header
-    system('clear')
-    puts '⭐️ Игра BlackJack ⭐️'
-    help
-    puts "Текущий раунд: #{round}"
-  end
-
-  def player_information(player, hidden: true)
-    print_header(player)
-    print_points(player, hidden)
-    print_cards(player, hidden)
-  end
-
-  def print_header(player)
-    puts '====================='
-    puts "Игрок #{player.name} $: #{player.money}"
-  end
-
-  def print_points(player, hidden)
-    points = hidden ? '' : "Очки: #{count_points(player.cards)}"
-    puts points unless hidden
-  end
-
-  def print_cards(player, hidden)
-    cards = hidden ? closed(player.cards.size) : player.cards
-    cards ||= []
-    cards.each { |card| puts card[:card] }
-  end
-
   def create_player
-    self.user = Player.new(ask_name.capitalize)
-  end
-
-  def ask_name
-    puts ASK_NAME
-    gets.chomp
+    self.user = Player.new(print_ask_name.capitalize)
   end
 
   def create_dealer
