@@ -42,14 +42,32 @@ class Game
 
   def new_round
     round_money_bets
-    # players.cards += 2
+    generate_deck
+    2.times { players_add_cards(user) }
+    2.times { players_add_cards(dealer) }
     game_interface
+  end
+
+  # TODO: add validation below zero
+  def round_money_bets
+    user.money -= 10
+    dealer.money -= 10
+    self.bank += 20
+  end
+
+  def players_add_cards(player)
+    player.cards << cards.sample
+    remove_cards_from_deck(player.cards)
+  end
+
+  def remove_cards_from_deck(player_cards)
+    self.cards -= player_cards
   end
 
   def game_interface
     game_header
     player_information(dealer)
-    player_information(user, false)
+    player_information(user, hidden: false)
     puts '====================='
     puts PLAYER_ACTIONS
   end
@@ -61,22 +79,17 @@ class Game
     puts "Текущий раунд: #{round}"
   end
 
-  # TODO: fix bug
-  def player_information(player, hidden = true)
+  def player_information(player, hidden: true)
     puts '====================='
     puts "Игрок #{player.name} $: #{player.money}"
     points = hidden ? '' : "Очки: #{count_points(player.cards)}"
     puts points unless hidden
-    cards = hidden ? '🃏🃏🃏' : player.cards
+    # cards = hidden ? closed(player.cards.size) : player.cards
+    cards = hidden ? closed(rand(2..4)) : player.cards
     puts cards
   end
 
-  # TODO: add validation below zero
-  def round_money_bets
-    user.money -= 10
-    dealer.money -= 10
-    self.bank += 20
-  end
+
 
   def create_player
     self.user = Player.new(ask_name.capitalize)

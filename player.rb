@@ -6,7 +6,7 @@ class Player
 
   def initialize(name)
     @name = name
-    @cards = {}
+    @cards = []
     @money = 0
   end
 
