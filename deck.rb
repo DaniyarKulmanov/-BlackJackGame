@@ -3,7 +3,7 @@
 require_relative 'constants'
 
 module Deck
-  attr_reader :cards
+  attr_accessor :cards
 
   def help
     puts 'Король, Дама, Валет = 10, Туз = 11 или 1'
@@ -40,5 +40,6 @@ module Deck
     card[:card] = card_suit
     card[:point] = number
     card[:alter_points] = 11 if card_suit.include? 'Туз'
+    card
   end
 end

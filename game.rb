@@ -80,16 +80,26 @@ class Game
   end
 
   def player_information(player, hidden: true)
-    puts '====================='
-    puts "Игрок #{player.name} $: #{player.money}"
-    points = hidden ? '' : "Очки: #{count_points(player.cards)}"
-    puts points unless hidden
-    # cards = hidden ? closed(player.cards.size) : player.cards
-    cards = hidden ? closed(rand(2..4)) : player.cards
-    puts cards
+    print_header(player)
+    print_points(player, hidden)
+    print_cards(player, hidden)
   end
 
+  def print_header(player)
+    puts '====================='
+    puts "Игрок #{player.name} $: #{player.money}"
+  end
 
+  def print_points(player, hidden)
+    points = hidden ? '' : "Очки: #{count_points(player.cards)}"
+    puts points unless hidden
+  end
+
+  def print_cards(player, hidden)
+    cards = hidden ? closed(player.cards.size) : player.cards
+    cards ||= []
+    cards.each { |card| puts card[:card] }
+  end
 
   def create_player
     self.user = Player.new(ask_name.capitalize)
