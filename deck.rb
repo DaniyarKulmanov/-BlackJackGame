@@ -15,10 +15,6 @@ module Deck
     pic_cards(cards)
   end
 
-  def count_points(_cards)
-    21
-  end
-
   def closed(cards)
     puts '🃏' * cards
   end

@@ -47,7 +47,7 @@ class Game
     generate_deck
     2.times { players_add_cards(user) }
     2.times { players_add_cards(dealer) }
-    print_game_interface
+    print_game_interface(dealer, user)
   end
 
   # TODO: add validation below zero
@@ -59,7 +59,13 @@ class Game
 
   def players_add_cards(player)
     player.cards << cards.sample
+    player.points = count_points(player)
     remove_cards_from_deck(player.cards)
+  end
+
+  # TODO: refactor
+  def count_points(player)
+    player.points = 21
   end
 
   def remove_cards_from_deck(player_cards)

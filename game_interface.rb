@@ -6,7 +6,7 @@ module GameInterface
     gets.chomp
   end
 
-  def print_game_interface
+  def print_game_interface(dealer, user)
     print_game_header
     print_information(dealer)
     print_information(user, hidden: false)
@@ -37,7 +37,7 @@ module GameInterface
   end
 
   def print_points(player, hidden)
-    points = hidden ? '' : "Очки: #{count_points(player.cards)}"
+    points = hidden ? '' : "Очки: #{player.points}"
     puts points unless hidden
   end
 
