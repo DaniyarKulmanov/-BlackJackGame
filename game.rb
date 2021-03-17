@@ -63,9 +63,8 @@ class Game
     remove_cards_from_deck(player.cards)
   end
 
-  # TODO: refactor
   def count_points(player)
-    player.points = 21
+    player.points = player.cards.sum { |card| card[:point] }
   end
 
   def remove_cards_from_deck(player_cards)

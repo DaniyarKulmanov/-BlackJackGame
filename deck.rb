@@ -34,8 +34,8 @@ module Deck
   def create_card(card_suit, number)
     card = {}
     card[:card] = card_suit
-    card[:point] = number
-    card[:alter_points] = 11 if card_suit.include? 'Туз'
+    card[:point] = card_suit.include?(ACE) ? 1 : number
+    card[:alter_points] = 11 if card_suit.include? ACE
     card
   end
 end
