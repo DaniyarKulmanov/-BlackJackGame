@@ -25,29 +25,41 @@ class Game
 
   def start
     base_money
-    self.round = 1
+    self.round = 0
+    new_round
     play
+    finish_game
   end
 
   private
 
   attr_writer :user, :dealer, :bank
-  attr_accessor :round
+  attr_accessor :round, :action
 
   def play
     loop do
-      new_round
-      self.round += 1
-      break if round > 1
+      self.round += ROUND_COUNT
+      self.action = print_game_interface(dealer, user)
+      # send :method - user input
+      break if stop_game?
     end
   end
 
+  def stop_game?
+    action.to_i == OPEN_CARDS || (user.points > 21 || dealer.points > 21)
+  end
+
   def new_round
+    refresh_player_cards
     round_money_bets
     generate_deck
     2.times { players_add_cards(user) }
     2.times { players_add_cards(dealer) }
-    print_game_interface(dealer, user)
+  end
+
+  def refresh_player_cards
+    user.cards = []
+    dealer.cards = []
   end
 
   # TODO: add validation below zero
@@ -86,5 +98,8 @@ class Game
   end
 
   # save statistics
-  def finish_game; end
+  def finish_game
+    user_input = print_game_exit
+    start if user_input.to_i == FIRST_ROUND
+  end
 end

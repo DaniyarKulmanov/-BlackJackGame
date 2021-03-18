@@ -16,6 +16,7 @@ module GameInterface
   def print_footer
     puts LINE
     puts PLAYER_ACTIONS
+    gets.chomp
   end
 
   def print_game_header
@@ -46,5 +47,10 @@ module GameInterface
     cards ||= []
     cards.each { |card| print "#{card[:card]} " }
     puts '' unless hidden
+  end
+
+  def print_game_exit
+    puts EXIT_MENU
+    gets.chomp
   end
 end
