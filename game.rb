@@ -25,7 +25,7 @@ class Game
 
   def start
     base_money
-    self.round = 0
+    self.round = 1
     new_round
     play
     finish_game
@@ -36,17 +36,73 @@ class Game
   attr_writer :user, :dealer, :bank
   attr_accessor :round, :action
 
+  # TODO: bug when open_cards round, money refreshing
   def play
     loop do
-      self.round += ROUND_COUNT
       self.action = print_game_interface(dealer, user)
-      # send :method - user input
+      players_turn
+      round_check unless open_cards?
       break if stop_game?
     end
   end
 
+  def round_check
+    if bankrupt?
+      self.action = STOP_GAME
+    elsif next_round?
+      round_result
+      new_round
+    end
+  end
+
+  def next_round?
+    points_above? || draw?
+  end
+
+  def points_above?
+    user.points > 21 || dealer.points > 21
+  end
+
+  def draw?
+    user.points == dealer.points
+  end
+
+  def bankrupt?
+    user.money.zero? || dealer.money.zero?
+  end
+
+  def round_result
+    show_cards
+    print_round_footer
+    self.round += ROUND_COUNT
+  end
+
+  def players_turn
+    user_turn
+    dealer_turn unless open_cards?
+  end
+
+  def open_cards?
+    action.to_i == OPEN_CARDS
+  end
+
+  def user_turn
+    players_add_cards(user) if action.to_i == 1
+    open_cards_all if action.to_i == 2
+  end
+
+  def open_cards_all
+    round_result
+    new_round
+    play
+  end
+
+  def dealer_turn
+    players_add_cards(dealer) if dealer.points < 17
+  end
+
   def stop_game?
-    action.to_i == OPEN_CARDS || (user.points > 21 || dealer.points > 21)
+    action.to_i == STOP_GAME
   end
 
   def new_round
@@ -101,5 +157,10 @@ class Game
   def finish_game
     user_input = print_game_exit
     start if user_input.to_i == FIRST_ROUND
+  end
+
+  def show_cards
+    print_information(dealer, hidden: false)
+    print_information(user, hidden: false)
   end
 end

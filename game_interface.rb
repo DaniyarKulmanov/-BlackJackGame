@@ -32,6 +32,11 @@ module GameInterface
     print_cards(player, hidden)
   end
 
+  def print_round_footer
+    puts INFORMATION
+    gets.chomp
+  end
+
   def print_header(player)
     puts LINE
     puts "Игрок #{player.name} $: #{player.money}"
@@ -45,7 +50,7 @@ module GameInterface
   def print_cards(player, hidden)
     cards = hidden ? closed(player.cards.size) : player.cards
     cards ||= []
-    cards.each { |card| print "#{card[:card]} " }
+    cards.each { |card| print "#{card[:card]}  " }
     puts '' unless hidden
   end
 
