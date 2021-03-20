@@ -5,7 +5,7 @@ require_relative 'constants'
 
 class Dealer < Player
   def initialize
-    self.name = NAMES.sample
+    self.name = "Диллер #{NAMES.sample}"
     super(name)
   end
 end

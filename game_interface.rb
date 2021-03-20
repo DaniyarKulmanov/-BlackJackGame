@@ -33,7 +33,7 @@ module GameInterface
   end
 
   def print_round_footer(winner)
-    puts "Выйграл 🏆 🏆 🏆 #{winner.name}🏆 🏆 🏆 "
+    puts "Выйграл 🏆 🏆 🏆 #{winner}🏆 🏆 🏆 "
     puts INFORMATION
     gets.chomp
   end

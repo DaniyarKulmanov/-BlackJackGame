@@ -29,10 +29,10 @@ class Game
   attr_writer :user, :dealer, :bank
   attr_accessor :round, :action
 
+  # TODO: after open cards, stop game not triggering
   def play_rounds
     loop do
       new_round unless add_card?
-      user_input
       user_turn
       dealer_turn unless open_cards?
       round_check
@@ -41,11 +41,12 @@ class Game
     finish_game
   end
 
-  def user_input
+  def user_turn
     loop do
       self.action = print_game_interface(dealer, user)
       break if action =~ USER_COMMANDS
     end
+    user_action
   end
 
   def round_check
@@ -53,8 +54,8 @@ class Game
       self.action = STOP_GAME
       round_result
     elsif next_round?
-      clean_user_input
       round_result
+      clean_user_input
     end
   end
 
@@ -84,15 +85,27 @@ class Game
     self.round += ROUND_COUNT
   end
 
+  # TODO: bug winner not seen if open cards
   def round_winner
-    user # TODO: make winner algorithm
+    if user.points <= MAX_POINTS && dealer.points <= MAX_POINTS
+      puts "points user #{user.points} / dealer #{dealer.points}"
+      user.name if user.points > dealer.points
+      dealer.name if user.points < dealer.points
+      'draw' if user.points == dealer.points
+    elsif user.points <= MAX_POINTS && dealer.points > MAX_POINTS
+      user.name
+    elsif dealer.points <= MAX_POINTS && user.points > MAX_POINTS
+      dealer.name
+    elsif user.points > MAX_POINTS && dealer.points > MAX_POINTS
+      'draw'
+    end
   end
 
   def open_cards?
     action.to_i == OPEN_CARDS
   end
 
-  def user_turn
+  def user_action
     add_card(user) if add_card?
   end
 
