@@ -32,7 +32,8 @@ module GameInterface
     print_cards(player, hidden)
   end
 
-  def print_round_footer
+  def print_round_footer(winner)
+    puts "Выйграл 🏆 🏆 🏆 #{winner.name}🏆 🏆 🏆 "
     puts INFORMATION
     gets.chomp
   end
