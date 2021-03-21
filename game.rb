@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # save game records and make leaderboard
+require 'pry'
 require_relative 'player'
 require_relative 'dealer'
 require_relative 'constants'
@@ -27,9 +28,9 @@ class Game
   private
 
   attr_writer :user, :dealer, :bank
-  attr_accessor :round, :action
+  attr_accessor :round, :action, :winner
 
-  # TODO: after open cards, stop game not triggering
+  # TODO: ACE logic
   def play_rounds
     loop do
       new_round unless add_card?
@@ -43,10 +44,10 @@ class Game
 
   def user_turn
     loop do
-      self.action = print_game_interface(dealer, user)
+      self.action = print_game_interface(dealer, user, round, bank)
       break if action =~ USER_COMMANDS
     end
-    user_action
+    add_card(user) if add_card?
   end
 
   def round_check
@@ -80,33 +81,62 @@ class Game
   end
 
   def round_result
+    round_winner
     show_cards
-    print_round_footer(round_winner)
+    print_round_footer(winner)
     self.round += ROUND_COUNT
   end
 
-  # TODO: bug winner not seen if open cards
   def round_winner
-    if user.points <= MAX_POINTS && dealer.points <= MAX_POINTS
-      puts "points user #{user.points} / dealer #{dealer.points}"
-      user.name if user.points > dealer.points
-      dealer.name if user.points < dealer.points
-      'draw' if user.points == dealer.points
-    elsif user.points <= MAX_POINTS && dealer.points > MAX_POINTS
-      user.name
-    elsif dealer.points <= MAX_POINTS && user.points > MAX_POINTS
-      dealer.name
-    elsif user.points > MAX_POINTS && dealer.points > MAX_POINTS
-      'draw'
-    end
+    points_in_limit if both_in_limit?
+    won(user) if dealer_points_exceed?
+    won(dealer) if user_points_exceed?
+    draw if both_exceed?
+  end
+
+  def both_in_limit?
+    user.points <= MAX_POINTS && dealer.points <= MAX_POINTS
+  end
+
+  def dealer_points_exceed?
+    user.points <= MAX_POINTS && dealer.points > MAX_POINTS
+  end
+
+  def user_points_exceed?
+    dealer.points <= MAX_POINTS && user.points > MAX_POINTS
+  end
+
+  def both_exceed?
+    user.points > MAX_POINTS && dealer.points > MAX_POINTS
+  end
+
+  def points_in_limit
+    won(user) if user_points_better?
+    won(dealer) if dealer_points_better?
+    draw if draw?
+  end
+
+  def won(player)
+    self.winner = player.name
+    player.money += bank
+  end
+
+  def draw
+    self.winner = DRAW
+    user.money += BASE_BET
+    dealer.money += BASE_BET
+  end
+
+  def user_points_better?
+    user.points > dealer.points
+  end
+
+  def dealer_points_better?
+    user.points < dealer.points
   end
 
   def open_cards?
     action.to_i == OPEN_CARDS
-  end
-
-  def user_action
-    add_card(user) if add_card?
   end
 
   def add_card?
@@ -118,11 +148,11 @@ class Game
   end
 
   def stop_game?
-    action.to_i == STOP_GAME
+    action.to_i == STOP_GAME || bankrupt?
   end
 
   def new_round
-    refresh_player_cards
+    initialize_round
     make_bet(user)
     make_bet(dealer)
     generate_deck
@@ -130,9 +160,11 @@ class Game
     2.times { add_card(dealer) }
   end
 
-  def refresh_player_cards
+  def initialize_round
     user.cards = []
     dealer.cards = []
+    self.winner = nil
+    self.bank = INITIAL_VALUE
   end
 
   def make_bet(player)

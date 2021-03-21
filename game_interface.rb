@@ -6,8 +6,8 @@ module GameInterface
     gets.chomp
   end
 
-  def print_game_interface(dealer, user)
-    print_game_header
+  def print_game_interface(dealer, user, round, bank)
+    print_game_header(round, bank)
     print_information(dealer)
     print_information(user, hidden: false)
     print_footer
@@ -19,11 +19,11 @@ module GameInterface
     gets.chomp
   end
 
-  def print_game_header
+  def print_game_header(round, bank)
     system('clear')
     puts '⭐️ Игра BlackJack ⭐️'
     help
-    puts "Текущий раунд: #{round}"
+    puts "Текущий раунд: #{round}, ставка #{bank}"
   end
 
   def print_information(player, hidden: true)
