@@ -65,7 +65,11 @@ class Game
   end
 
   def next_round?
-    points_above? || draw? || open_cards?
+    points_above? || draw? || open_cards? || both_triple_cards?
+  end
+
+  def both_triple_cards?
+    user.cards.size == MAX_CARDS && dealer.cards.size == MAX_CARDS
   end
 
   def points_above?
@@ -174,11 +178,25 @@ class Game
 
   def add_card(player)
     player.cards << cards.sample
-    player.points = count_points(player)
+    count_points(player)
     remove_cards_from_deck(player.cards)
   end
 
   def count_points(player)
+    sum_no_aces(player) unless ace?(player.cards)
+    sum_with_aces(player) if ace?(player.cards)
+  end
+
+  def ace?(cards)
+    cards.find { |card| card[:card].include?(ACE) } != nil
+  end
+
+  def sum_no_aces(player)
+    player.points = player.cards.sum { |card| card[:point] }
+  end
+
+  def sum_with_aces(player)
+    # TODO: count with aces each
     player.points = player.cards.sum { |card| card[:point] }
   end
 

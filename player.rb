@@ -8,6 +8,7 @@ class Player
     @name = name
     @cards = []
     @money = 0
+    @points = 0
   end
 
   private
