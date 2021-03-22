@@ -7,12 +7,14 @@ require_relative 'dealer'
 require_relative 'constants'
 require_relative 'deck'
 require_relative 'game_interface'
+require_relative 'validaions'
 
 class Game
   include Deck
   include GameInterface
+  include Validations
 
-  attr_reader :user, :dealer, :bank
+  attr_reader :bank
 
   def initialize
     create_player
@@ -27,8 +29,8 @@ class Game
 
   private
 
-  attr_writer :user, :dealer, :bank
-  attr_accessor :round, :action, :winner
+  attr_writer :bank
+  attr_accessor :round, :winner
 
   def play_rounds
     loop do
@@ -46,7 +48,7 @@ class Game
       self.action = print_game_interface(dealer, user, round, bank)
       break if action =~ USER_COMMANDS
     end
-    add_card(user) if add_card?
+    add_card(user) if add_card? && user_cards_not_max?
   end
 
   def round_check
@@ -63,26 +65,6 @@ class Game
     self.action = INITIAL_VALUE
   end
 
-  def next_round?
-    points_above? || draw? || open_cards? || both_triple_cards?
-  end
-
-  def both_triple_cards?
-    user.cards.size == MAX_CARDS && dealer.cards.size == MAX_CARDS
-  end
-
-  def points_above?
-    user.points > MAX_POINTS || dealer.points > MAX_POINTS
-  end
-
-  def draw?
-    user.points == dealer.points
-  end
-
-  def bankrupt?
-    user.money.zero? || dealer.money.zero?
-  end
-
   def round_result
     round_winner
     print_show_cards(dealer, user)
@@ -95,22 +77,6 @@ class Game
     won(user) if dealer_points_exceed?
     won(dealer) if user_points_exceed?
     draw if both_exceed?
-  end
-
-  def both_in_limit?
-    user.points <= MAX_POINTS && dealer.points <= MAX_POINTS
-  end
-
-  def dealer_points_exceed?
-    user.points <= MAX_POINTS && dealer.points > MAX_POINTS
-  end
-
-  def user_points_exceed?
-    dealer.points <= MAX_POINTS && user.points > MAX_POINTS
-  end
-
-  def both_exceed?
-    user.points > MAX_POINTS && dealer.points > MAX_POINTS
   end
 
   def points_in_limit
@@ -130,28 +96,8 @@ class Game
     dealer.money += BASE_BET
   end
 
-  def user_points_better?
-    user.points > dealer.points
-  end
-
-  def dealer_points_better?
-    user.points < dealer.points
-  end
-
-  def open_cards?
-    action.to_i == OPEN_CARDS
-  end
-
-  def add_card?
-    action.to_i == ADD_CARD
-  end
-
   def dealer_turn
     add_card(dealer) if dealer.points < DEALER_POINTS && action != OPEN_CARDS
-  end
-
-  def stop_game?
-    action.to_i == STOP_GAME || bankrupt?
   end
 
   def new_round
@@ -184,10 +130,6 @@ class Game
   def count_points(player)
     sum_no_aces(player, player.cards) unless ace?(player.cards)
     sum_with_aces(player) if ace?(player.cards)
-  end
-
-  def ace?(cards)
-    cards.find { |card| card[:card].include?(ACE) } != nil
   end
 
   def sum_no_aces(player, simple_cards)
