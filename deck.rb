@@ -35,7 +35,7 @@ module Deck
     card = {}
     card[:card] = card_suit
     card[:point] = card_suit.include?(ACE) ? 1 : number
-    card[:alter_points] = 11 if card_suit.include? ACE
+    card[:alter_point] = 11 if card_suit.include? ACE
     card
   end
 end

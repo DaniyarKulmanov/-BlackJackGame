@@ -30,7 +30,6 @@ class Game
   attr_writer :user, :dealer, :bank
   attr_accessor :round, :action, :winner
 
-  # TODO: ACE logic
   def play_rounds
     loop do
       new_round unless add_card?
@@ -86,7 +85,7 @@ class Game
 
   def round_result
     round_winner
-    show_cards
+    print_show_cards(dealer, user)
     print_round_footer(winner)
     self.round += ROUND_COUNT
   end
@@ -183,7 +182,7 @@ class Game
   end
 
   def count_points(player)
-    sum_no_aces(player) unless ace?(player.cards)
+    sum_no_aces(player, player.cards) unless ace?(player.cards)
     sum_with_aces(player) if ace?(player.cards)
   end
 
@@ -191,13 +190,27 @@ class Game
     cards.find { |card| card[:card].include?(ACE) } != nil
   end
 
-  def sum_no_aces(player)
-    player.points = player.cards.sum { |card| card[:point] }
+  def sum_no_aces(player, simple_cards)
+    player.points = simple_cards.sum { |card| card[:point] }
   end
 
   def sum_with_aces(player)
-    # TODO: count with aces each
-    player.points = player.cards.sum { |card| card[:point] }
+    aces = player.cards.reject { |card| card[:alter_point].nil? }
+    simple_cards = player.cards.select { |card| card[:alter_point].nil? }
+    sum_no_aces(player, simple_cards)
+    points = player.points
+    sums = [points, points, points]
+    count_aces(aces, sums)
+    player.points = sums.select { |sum| sum <= 21 }.last
+  end
+
+  def count_aces(aces, sums)
+    aces.each do |card|
+      sums[2] = sums[0]
+      sums[0] += card[:point]
+      sums[1] += card[:alter_point]
+      sums[2] += card[:alter_point]
+    end
   end
 
   def remove_cards_from_deck(player_cards)
@@ -218,14 +231,8 @@ class Game
     user.money = BASE_MONEY
   end
 
-  # save statistics
   def finish_game
     user_input = print_game_exit
     start if user_input.to_i == NEW_GAME
-  end
-
-  def show_cards
-    print_information(dealer, hidden: false)
-    print_information(user, hidden: false)
   end
 end

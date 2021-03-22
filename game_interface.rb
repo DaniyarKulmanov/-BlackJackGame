@@ -59,4 +59,9 @@ module GameInterface
     puts EXIT_MENU
     gets.chomp
   end
+
+  def print_show_cards(dealer, user)
+    print_information(dealer, hidden: false)
+    print_information(user, hidden: false)
+  end
 end
