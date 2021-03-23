@@ -9,7 +9,6 @@ require_relative 'game_interface'
 require_relative 'validations'
 
 class Game
-  include GameInterface
   include Validations
 
   BASE_MONEY = 100
@@ -21,14 +20,16 @@ class Game
   STOP_GAME = 3
   BASE_BET = 10
   ROUND_COUNT = 1
-  USER_COMMANDS = /^[1-3]$/.freeze
 
-  attr_reader :bank
+  attr_reader :bank, :user, :dealer, :round
+  attr_accessor :action
 
   def initialize(interface)
     @interface = interface
     create_player
     create_dealer
+    self.interface.user = user
+    self.interface.dealer = dealer
   end
 
   def start
@@ -39,8 +40,8 @@ class Game
 
   private
 
-  attr_writer :bank
-  attr_accessor :round, :winner, :interface
+  attr_writer :bank, :user, :dealer, :round
+  attr_accessor :winner, :interface
 
   def play_rounds
     loop do
@@ -54,10 +55,7 @@ class Game
   end
 
   def user_turn
-    loop do
-      self.action = print_game_interface(dealer, user, round, bank)
-      break if action =~ USER_COMMANDS
-    end
+    user_action(self)
     add_card(user) if add_card? && user_cards_not_max?
   end
 
@@ -77,8 +75,9 @@ class Game
 
   def round_result
     round_winner
-    print_show_cards(dealer, user)
-    print_round_footer(winner)
+    interface.info_layout(dealer, hidden: false)
+    interface.info_layout(user, hidden: false)
+    round_end(winner)
     self.round += ROUND_COUNT
   end
 
@@ -146,7 +145,7 @@ class Game
   end
 
   def finish_game
-    user_input = print_game_exit
+    user_input = game_over
     start if user_input.to_i == NEW_GAME
   end
 end

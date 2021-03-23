@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
+# TODO: solve action attribute
 module Validations
-  attr_reader :user, :dealer
-
   private
 
   attr_writer :user, :dealer
-  attr_accessor :action
 
   # TODO: not checking triple cards
   def next_round?

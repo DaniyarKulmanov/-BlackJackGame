@@ -7,7 +7,6 @@ class Deck
   PIC_CARDS = %w[Король Дама Валет].freeze
   NUM_CARDS = (2..10).freeze
   ACES = 'Туз'
-  HELP = 'Король, Дама, Валет = 10, Туз = 11 или 1'
 
   attr_accessor :cards
 

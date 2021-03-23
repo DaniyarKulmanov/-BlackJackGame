@@ -12,11 +12,14 @@ class GameInterface
                'Нажмите 1 - 🔥 Новая игра!',
                'Введите любое значение и нажмите ENTER для завершение игры 😟'].freeze
   INFORMATION = ['Введите любое значение и нажмите ENTER для продолжения'].freeze
+  HELP = 'Король, Дама, Валет = 10, Туз = 11 или 1'
+  USER_COMMANDS = /^[1-3]$/.freeze
 
   attr_reader :user_name
+  attr_accessor :user, :dealer
 
   def initialize
-    @user_name = print_ask_name
+    @user_name = ask_name
   end
 
   def closed(cards)
@@ -27,67 +30,61 @@ class GameInterface
     puts HELP
   end
 
-  def print_ask_name
+  def ask_name
     puts ASK_NAME
     gets.chomp
   end
 
-  def print_game_interface(dealer, user, round, bank)
-    print_game_header(round, bank)
-    print_information(dealer)
-    print_information(user, hidden: false)
-    print_footer
+  def user_action(game)
+    loop do
+      game.action = main_layout(game.round, game.bank)
+      break if game.action =~ USER_COMMANDS
+    end
   end
 
-  def print_footer
+  def main_layout(round, bank)
+    header(round, bank)
+    info_layout(dealer)
+    info_layout(user, hidden: false)
+    footer
+  end
+
+  def footer
     puts LINE
     puts PLAYER_ACTIONS
     gets.chomp
   end
 
-  def print_game_header(round, bank)
+  def header(round, bank)
     system('clear')
     puts '⭐️ Игра BlackJack ⭐️'
     help
     puts "Текущий раунд: #{round}, ставка #{bank}"
   end
 
-  def print_information(player, hidden: true)
-    print_header(player)
-    print_points(player, hidden)
-    print_cards(player, hidden)
+  def info_layout(player, hidden: true)
+    puts LINE
+    puts "Игрок #{player.name} $: #{player.money}"
+    points = hidden ? '' : "Очки: #{player.hand.points}"
+    puts points unless hidden
+    display_cards(player.hand.cards, hidden)
   end
 
-  def print_round_footer(winner)
+  def round_end(winner)
     puts "Выйграл 🏆 🏆 🏆 #{winner}🏆 🏆 🏆 "
     puts INFORMATION
     gets.chomp
   end
 
-  def print_header(player)
-    puts LINE
-    puts "Игрок #{player.user_name} $: #{player.money}"
-  end
-
-  def print_points(player, hidden)
-    points = hidden ? '' : "Очки: #{player.points}"
-    puts points unless hidden
-  end
-
-  def print_cards(player, hidden)
-    cards = hidden ? closed(player.cards.size) : player.cards
+  def display_cards(cards, hidden)
+    cards = hidden ? closed(cards.size) : cards
     cards ||= []
-    cards.each { |card| print "#{card[:card]}  " }
+    cards.each { |card| print "#{card.suit}  " }
     puts '' unless hidden
   end
 
-  def print_game_exit
+  def game_over
     puts EXIT_MENU
     gets.chomp
-  end
-
-  def print_show_cards(dealer, user)
-    print_information(dealer, hidden: false)
-    print_information(user, hidden: false)
   end
 end

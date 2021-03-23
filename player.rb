@@ -5,7 +5,7 @@ require_relative 'hand'
 class Player
   NAMES = %w[Виталий Борис Иван Петр Данияр Тимур Рустам ДедМороз Вася].freeze
 
-  attr_reader :user_name, :hand
+  attr_reader :name, :hand
   attr_accessor :money
 
   def initialize(name)
@@ -20,5 +20,5 @@ class Player
 
   private
 
-  attr_writer :user_name, :hand
+  attr_writer :name, :hand
 end
