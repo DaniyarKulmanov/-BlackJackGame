@@ -9,7 +9,6 @@ require_relative 'game_interface'
 require_relative 'validations'
 
 class Game
-  include Deck
   include GameInterface
   include Validations
 
@@ -114,7 +113,7 @@ class Game
     initialize_round
     make_bet(user)
     make_bet(dealer)
-    generate_deck
+    # deck = Deck.new
     2.times { add_card(user) }
     2.times { add_card(dealer) }
   end

@@ -13,6 +13,14 @@ module GameInterface
                'Введите любое значение и нажмите ENTER для завершение игры 😟'].freeze
   INFORMATION = ['Введите любое значение и нажмите ENTER для продолжения'].freeze
 
+  def closed(cards)
+    puts '🃏' * cards
+  end
+
+  def help
+    puts HELP
+  end
+
   def print_ask_name
     puts ASK_NAME
     gets.chomp
