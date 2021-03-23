@@ -8,14 +8,14 @@ class Card
   def initialize(suit, points)
     @suit = suit
     @points = points
-    @alter_points = ace? ? 11 : 0
+    @alter_points = ace(suit)
   end
 
   private
 
   attr_writer :alter_points
 
-  def ace?
-    suit.include?(ACE)
+  def ace(suit)
+    suit.include?(ACE) ? 11 : 0
   end
 end
