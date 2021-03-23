@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
-require_relative 'constants'
-
 module Deck
+  SUITS = %w[♠️ ♣️ ♥️ ♦️].freeze
+  PIC_CARDS = %w[Туз Король Дама Валет].freeze
+  ACE = 'Туз'
+  NUM_CARDS = (2..10).freeze
+
   attr_accessor :cards
 
   def help

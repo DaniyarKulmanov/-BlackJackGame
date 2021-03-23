@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Player
+  NAMES = %w[Виталий Борис Иван Петр Данияр Тимур Рустам ДедМороз Вася].freeze
+
   attr_reader :name
   attr_accessor :money, :cards, :points
 

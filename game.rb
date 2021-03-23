@@ -4,15 +4,25 @@
 require 'pry'
 require_relative 'player'
 require_relative 'dealer'
-require_relative 'constants'
 require_relative 'deck'
 require_relative 'game_interface'
-require_relative 'validaions'
+require_relative 'validations'
 
 class Game
   include Deck
   include GameInterface
   include Validations
+
+  BASE_MONEY = 100
+  INITIAL_VALUE = 0
+  FIRST_ROUND = 1
+  NEW_GAME = 1
+  ADD_CARD = 1
+  OPEN_CARDS = 2
+  STOP_GAME = 3
+  BASE_BET = 10
+  ROUND_COUNT = 1
+  USER_COMMANDS = /^[1-3]$/.freeze
 
   attr_reader :bank
 
