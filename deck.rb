@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+require_relative 'card'
 
 module Deck
   SUITS = %w[♠️ ♣️ ♥️ ♦️].freeze
   PIC_CARDS = %w[Туз Король Дама Валет].freeze
-  ACE = 'Туз'
   NUM_CARDS = (2..10).freeze
+  HELP = 'Король, Дама, Валет = 10, Туз = 11 или 1'
 
   attr_accessor :cards
 
   def help
-    puts 'Король, Дама, Валет = 10, Туз = 11 или 1'
+    puts HELP
   end
 
   def generate_deck
@@ -37,8 +38,8 @@ module Deck
   def create_card(card_suit, number)
     card = {}
     card[:card] = card_suit
-    card[:point] = card_suit.include?(ACE) ? 1 : number
-    card[:alter_point] = 11 if card_suit.include? ACE
+    card[:point] = card_suit.include?(PIC_CARDS[0]) ? 1 : number
+    card[:alter_point] = 11 if card_suit.include? PIC_CARDS[0]
     card
   end
 end
