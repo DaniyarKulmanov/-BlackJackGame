@@ -25,7 +25,8 @@ class Game
 
   attr_reader :bank
 
-  def initialize
+  def initialize(interface)
+    @interface = interface
     create_player
     create_dealer
   end
@@ -39,7 +40,7 @@ class Game
   private
 
   attr_writer :bank
-  attr_accessor :round, :winner
+  attr_accessor :round, :winner, :interface
 
   def play_rounds
     loop do
@@ -95,7 +96,7 @@ class Game
   end
 
   def won(player)
-    self.winner = player.name
+    self.winner = player.user_name
     player.money += bank
   end
 
@@ -130,46 +131,8 @@ class Game
     self.bank += BASE_BET
   end
 
-  # def add_card(player)
-  #   player.cards << cards.sample
-  #   count_points(player)
-  #   remove_cards_from_deck(player.cards)
-  # end
-  #
-  # def count_points(player)
-  #   sum_no_aces(player, player.cards) unless ace?(player.cards)
-  #   sum_with_aces(player) if ace?(player.cards)
-  # end
-  #
-  # def sum_no_aces(player, simple_cards)
-  #   player.points = simple_cards.sum { |card| card[:point] }
-  # end
-  #
-  # def sum_with_aces(player)
-  #   aces = player.cards.reject { |card| card[:alter_point].nil? }
-  #   simple_cards = player.cards.select { |card| card[:alter_point].nil? }
-  #   sum_no_aces(player, simple_cards)
-  #   points = player.points
-  #   sums = [points, points, points]
-  #   count_aces(aces, sums)
-  #   player.points = sums.select { |sum| sum <= 21 }.last
-  # end
-  #
-  # def count_aces(aces, sums)
-  #   aces.each do |card|
-  #     sums[2] = sums[0]
-  #     sums[0] += card[:point]
-  #     sums[1] += card[:alter_point]
-  #     sums[2] += card[:alter_point]
-  #   end
-  # end
-  #
-  # def remove_cards_from_deck(player_cards)
-  #   self.cards -= player_cards
-  # end
-
   def create_player
-    self.user = Player.new(print_ask_name.capitalize)
+    self.user = Player.new(interface.user_name)
   end
 
   def create_dealer

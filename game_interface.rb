@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module GameInterface
+class GameInterface
   ASK_NAME = 'Введите Ваше имя'
   PLAYER_ACTIONS = ['Введите любое значение и нажмите ENTER чтобы пропустить ход️ ⏳',
                     '1 - 🤏 Добавить карту',
@@ -12,6 +12,12 @@ module GameInterface
                'Нажмите 1 - 🔥 Новая игра!',
                'Введите любое значение и нажмите ENTER для завершение игры 😟'].freeze
   INFORMATION = ['Введите любое значение и нажмите ENTER для продолжения'].freeze
+
+  attr_reader :user_name
+
+  def initialize
+    @user_name = print_ask_name
+  end
 
   def closed(cards)
     puts '🃏' * cards
@@ -60,7 +66,7 @@ module GameInterface
 
   def print_header(player)
     puts LINE
-    puts "Игрок #{player.name} $: #{player.money}"
+    puts "Игрок #{player.user_name} $: #{player.money}"
   end
 
   def print_points(player, hidden)

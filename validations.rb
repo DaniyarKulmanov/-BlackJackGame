@@ -13,8 +13,6 @@ module Validations
     points_above? || draw? || open_cards? || triple_cards_both?
   end
 
-
-
   def bankrupt?
     user.money.zero? || dealer.money.zero?
   end
