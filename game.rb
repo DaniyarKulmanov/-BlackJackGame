@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# save game records and make leaderboard
 require 'pry'
 require_relative 'player'
 require_relative 'dealer'
@@ -15,19 +14,16 @@ class Game
   INITIAL_VALUE = 0
   FIRST_ROUND = 1
   NEW_GAME = 1
-  ADD_CARD = 1
-  OPEN_CARDS = 2
-  STOP_GAME = 3
   BASE_BET = 10
   ROUND_COUNT = 1
+  DRAW = 'Ничья'
 
-  attr_reader :bank, :user, :dealer, :round
-  attr_accessor :action
+  attr_reader :bank, :round
 
   def initialize(interface)
     @interface = interface
-    create_player
-    create_dealer
+    self.user = Player.new(interface.user_name)
+    self.dealer = Dealer.new
     self.interface.user = user
     self.interface.dealer = dealer
   end
@@ -40,44 +36,44 @@ class Game
 
   private
 
-  attr_writer :bank, :user, :dealer, :round
-  attr_accessor :winner, :interface
+  attr_writer :bank, :round
+  attr_accessor :winner, :interface, :deck_cards
 
   def play_rounds
     loop do
-      new_round unless add_card?
+      new_round
       user_turn
-      dealer_turn unless open_cards?
-      round_check
+      dealer.turn(deck_cards) unless stop_game? || open_cards?
+      round_result
       break if stop_game?
     end
     finish_game
   end
 
-  def user_turn
-    user_action(self)
-    add_card(user) if add_card? && user_cards_not_max?
-  end
-
-  def round_check
-    if bankrupt?
-      self.action = STOP_GAME
-      round_result
-    elsif next_round?
-      round_result
-      clean_user_input
+  def new_round
+    initialize_round
+    make_bet(user)
+    make_bet(dealer)
+    2.times do
+      add_single_card(user.hand)
+      add_single_card(dealer.hand)
     end
   end
 
-  def clean_user_input
-    self.action = INITIAL_VALUE
+  def add_single_card(hand)
+    hand.add_card(deck_cards)
+  end
+
+  def user_turn
+    interface.user_action(self)
+    add_single_card(user.hand) if add_card?
   end
 
   def round_result
     round_winner
     interface.info_layout(dealer, hidden: false)
     interface.info_layout(user, hidden: false)
-    round_end(winner)
+    interface.round_end(winner)
     self.round += ROUND_COUNT
   end
 
@@ -95,7 +91,7 @@ class Game
   end
 
   def won(player)
-    self.winner = player.user_name
+    self.winner = player.name
     player.money += bank
   end
 
@@ -105,37 +101,18 @@ class Game
     dealer.money += BASE_BET
   end
 
-  def dealer_turn
-    add_card(dealer) if dealer.points < DEALER_POINTS && action != OPEN_CARDS
-  end
-
-  def new_round
-    initialize_round
-    make_bet(user)
-    make_bet(dealer)
-    # deck = Deck.new
-    2.times { add_card(user) }
-    2.times { add_card(dealer) }
-  end
-
   def initialize_round
-    user.cards = []
-    dealer.cards = []
+    user.hand.cards = []
+    dealer.hand.cards = []
     self.winner = nil
     self.bank = INITIAL_VALUE
+    deck = Deck.new
+    self.deck_cards = deck.cards
   end
 
   def make_bet(player)
     player.money -= BASE_BET
     self.bank += BASE_BET
-  end
-
-  def create_player
-    self.user = Player.new(interface.user_name)
-  end
-
-  def create_dealer
-    self.dealer = Dealer.new
   end
 
   def base_money
@@ -145,7 +122,7 @@ class Game
   end
 
   def finish_game
-    user_input = game_over
-    start if user_input.to_i == NEW_GAME
+    input = interface.game_over
+    start if input.to_i == NEW_GAME
   end
 end

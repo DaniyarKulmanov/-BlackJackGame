@@ -3,11 +3,10 @@
 require_relative 'card'
 
 class Hand
-  MAX_POINTS = 21
-  MAX_CARDS = 3
   ACE = 'Туз'
 
-  attr_reader :cards, :points
+  attr_reader :points
+  attr_accessor :cards
 
   def initialize
     @cards = []
@@ -18,15 +17,15 @@ class Hand
     cards.size == 3
   end
 
-  def add_card(card, deck)
-    cards << card
+  def add_card(deck_cards)
+    cards << deck_cards.sample
     count_points(cards)
-    remove_cards_from_deck(deck)
+    remove_cards_from_deck(deck_cards)
   end
 
   private
 
-  attr_writer :points, :cards
+  attr_writer :points
 
   def count_points(cards)
     sum_no_aces(cards) unless ace?(cards)
@@ -56,7 +55,7 @@ class Hand
   end
 
   def remove_cards_from_deck(deck)
-    deck.cards -= cards
+    deck - cards
   end
 
   def ace?(cards)

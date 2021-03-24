@@ -9,4 +9,14 @@ class Dealer < Player
     self.name = "Диллер #{NAMES.sample}"
     super(name)
   end
+
+  def turn(deck_cards)
+    hand.add_card(deck_cards) if max_points?
+  end
+
+  private
+
+  def max_points?
+    hand.points < DEALER_POINTS
+  end
 end

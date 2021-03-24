@@ -1,69 +1,60 @@
 # frozen_string_literal: true
 
-# TODO: solve action attribute
 module Validations
+  ADD_CARD = '1'
+  OPEN_CARDS = '2'
+  STOP_GAME = '3'
+  MAX_POINTS = 21
+  MAX_CARDS = 3
+
+  attr_reader :user, :dealer
+  attr_accessor :action
+
   private
 
   attr_writer :user, :dealer
-
-  # TODO: not checking triple cards
-  def next_round?
-    points_above? || draw? || open_cards? || triple_cards_both?
-  end
 
   def bankrupt?
     user.money.zero? || dealer.money.zero?
   end
 
   def stop_game?
-    action.to_i == STOP_GAME || bankrupt?
+    action == STOP_GAME || bankrupt?
   end
 
   def draw?
-    user.points == dealer.points
-  end
-
-  def points_above?
-    user.points > MAX_POINTS || dealer.points > MAX_POINTS
-  end
-
-  def triple_cards_both?
-    user.cards.size == MAX_CARDS && dealer.cards.size == MAX_CARDS
-  end
-
-  def user_cards_not_max?
-    user.cards.size < MAX_CARDS
+    user.hand.points == dealer.hand.points
   end
 
   def both_exceed?
-    user.points > MAX_POINTS && dealer.points > MAX_POINTS
+    user.hand.points > MAX_POINTS && dealer.hand.points > MAX_POINTS
   end
 
   def both_in_limit?
-    user.points <= MAX_POINTS && dealer.points <= MAX_POINTS
+    user.hand.points <= MAX_POINTS && dealer.hand.points <= MAX_POINTS
   end
 
   def dealer_points_exceed?
-    user.points <= MAX_POINTS && dealer.points > MAX_POINTS
+    user.hand.points <= MAX_POINTS && dealer.hand.points > MAX_POINTS
   end
 
   def user_points_exceed?
-    dealer.points <= MAX_POINTS && user.points > MAX_POINTS
+    dealer.hand.points <= MAX_POINTS && user.hand.points > MAX_POINTS
   end
 
   def open_cards?
-    action.to_i == OPEN_CARDS
+    action == OPEN_CARDS
   end
 
   def add_card?
-    action.to_i == ADD_CARD
+    action == ADD_CARD
   end
 
   def user_points_better?
-    user.points > dealer.points
+    user.hand.points > dealer.hand.points
   end
 
   def dealer_points_better?
-    user.points < dealer.points
+    user.hand.points < dealer.hand.points
   end
 end
