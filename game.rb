@@ -37,13 +37,13 @@ class Game
   private
 
   attr_writer :bank, :round
-  attr_accessor :winner, :interface, :deck_cards
+  attr_accessor :winner, :interface, :deck
 
   def play_rounds
     loop do
       new_round
       user_turn
-      dealer.turn(deck_cards) unless stop_game? || open_cards?
+      dealer.turn(deck.cards) unless stop_game? || open_cards?
       round_result
       break if stop_game?
     end
@@ -61,7 +61,7 @@ class Game
   end
 
   def add_single_card(hand)
-    hand.add_card(deck_cards)
+    hand.add_card(deck.cards)
   end
 
   def user_turn
@@ -106,8 +106,7 @@ class Game
     dealer.hand.cards = []
     self.winner = nil
     self.bank = INITIAL_VALUE
-    deck = Deck.new
-    self.deck_cards = deck.cards
+    self.deck = Deck.new
   end
 
   def make_bet(player)

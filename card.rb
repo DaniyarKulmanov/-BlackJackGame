@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require_relative 'deck'
+
 class Card
-  ACE = 'Туз'
+  SUITS = %w[♠️ ♣️ ♥️ ♦️].freeze
 
   attr_reader :suit, :points, :alter_points
 
@@ -16,6 +18,6 @@ class Card
   attr_writer :alter_points
 
   def ace(suit)
-    suit.include?(ACE) ? 11 : 0
+    suit.include?(Deck::ACES) ? 11 : 0
   end
 end

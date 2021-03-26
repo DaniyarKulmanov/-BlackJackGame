@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require_relative 'card'
+require_relative 'deck'
 
 class Hand
-  ACE = 'Туз'
-
   attr_reader :points
   attr_accessor :cards
 
@@ -37,21 +36,21 @@ class Hand
   end
 
   def sum_with_aces(cards)
-    aces = cards.select { |card| card.suit.include?(ACE) }
-    simple_cards = cards.reject { |card| card.suit.include?(ACE) }
+    aces = cards.select { |card| card.suit.include?(Deck::ACES) }
+    simple_cards = cards.reject { |card| card.suit.include?(Deck::ACES) }
     sum_no_aces(simple_cards)
-    sums = [points, points, points]
+    sums = { alter_points_and_points: points, only_points: points, only_alter_points: points }
     count_aces(aces, sums)
-    self.points = sums.select { |sum| sum <= 21 }.last
   end
 
   def count_aces(aces, sums)
     aces.each do |card|
-      sums[2] = sums[0]
-      sums[0] += card.points
-      sums[1] += card.alter_points
-      sums[2] += card.alter_points
+      sums[:alter_points_and_points] = sums[:only_points]
+      sums[:only_points] += card.points
+      sums[:only_alter_points] += card.alter_points
+      sums[:alter_points_and_points] += card.alter_points
     end
+    choose(sums)
   end
 
   def remove_cards_from_deck(deck)
@@ -59,6 +58,11 @@ class Hand
   end
 
   def ace?(cards)
-    cards.find { |card| card.suit.include?(ACE) } != nil
+    cards.find { |card| card.suit.include?(Deck::ACES) } != nil
+  end
+
+  def choose(sums)
+    sums.sort_by(&:last)
+    self.points = sums.select { |_key, value| value <= 21 }.max_by(&:last).last
   end
 end
